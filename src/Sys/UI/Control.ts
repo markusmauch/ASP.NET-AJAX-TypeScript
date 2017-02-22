@@ -1,7 +1,7 @@
 
 module Sys.UI
 {
-    export class Control
+    export class Control extends Sys.Component
     {
         
     }

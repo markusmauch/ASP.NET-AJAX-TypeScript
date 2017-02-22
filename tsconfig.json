@@ -12,12 +12,16 @@
         "src/Object.ts",
         "src/String.ts",
         "src/Type.ts",
+        "src/Sys/Application.ts",
         "src/Sys/EventArgs.ts",
         "src/Sys/EventHandlerList.ts",
         "src/Sys/Component.ts",
         "src/Sys/Res.ts",
+        "src/Sys/UI/Behavior.ts",
         "src/Sys/UI/Bounds.ts",
         "src/Sys/UI/Control.ts",
-        "src/Sys/UI/DomElement.ts"
+        "src/Sys/UI/DomElement.ts",
+        "src/Sys/UI/Point.ts",
+        "src/Sys/UI/VisibilityMode.ts"
     ]
 }

@@ -4,7 +4,8 @@ module Sys.UI
     export class DomElement
     {
         /**
-         * Adds a CSS class to a DOM element if the class is not already part of the DOM element. This member is static and can be invoked without creating an instance of the class.
+         * Adds a CSS class to a DOM element if the class is not already part of the DOM element.
+         * This member is static and can be invoked without creating an instance of the class.
          * @param element
          *      The {HTMLElement} object to add the CSS class to.
          * @param className
@@ -26,7 +27,8 @@ module Sys.UI
         }
 
         /**
-         * Gets a value that indicates whether the DOM element contains the specified CSS class. This member is static and can be invoked without creating an instance of the class.
+         * Gets a value that indicates whether the DOM element contains the specified CSS class.
+         * This member is static and can be invoked without creating an instance of the class.
          * @param element
          *      The {@link HTMLElement} object to test for the CSS class.
          * @param className
@@ -40,7 +42,8 @@ module Sys.UI
         }
 
         /**
-         * Gets a set of integer coordinates that represent the position, width, and height of a DOM element. This member is static and can be invoked without creating an instance of the class.
+         * Gets a set of integer coordinates that represent the position, width, and height of a DOM element.
+         * This member is static and can be invoked without creating an instance of the class.
          * @param element
          *      The Sys.UI.DomElement instance to get the coordinates of.
          * @returns
@@ -48,12 +51,13 @@ module Sys.UI
          */
         public static getBounds( element: HTMLElement )
         {
-            let offset = Sys.UI.DomElement.getLocation( element );
-            return new Sys.UI.Bounds(offset.x, offset.y, element.offsetWidth || 0, element.offsetHeight || 0);
+            let rect = element.getBoundingClientRect();
+            return new Sys.UI.Bounds( rect.left, rect.top, rect.width, rect.height );
         }
         
         /**
-         * Gets a DOM element that has the specified id attribute. This member is static and can be invoked without creating an instance of the class.
+         * Gets a DOM element that has the specified id attribute.
+         * This member is static and can be invoked without creating an instance of the class.
          * @param id
          *      The ID of the element to find.
          * @param element
@@ -61,13 +65,14 @@ module Sys.UI
          * @returns
          *      The {@link HTMLElement} object with the specified ID.
          */
-        public static getElementById( id: string, element: HTMLElement )
+        public static getElementById( id: string, element?: HTMLElement )
         {
-            return element.querySelector( "#" + id );
+            return ( element || document ).querySelector( "#" + id );
         }
 
         /**
-         * Gets the absolute position of a DOM element relative to the upper-left corner of the owner frame or window. This member is static and can be invoked without creating an instance of the class.
+         * Gets the absolute position of a DOM element relative to the upper-left corner of the owner frame or window.
+         * This member is static and can be invoked without creating an instance of the class.
          * @param element
          *      The target element.
          * @returns
@@ -75,7 +80,61 @@ module Sys.UI
          */
         public static getLocation( element: HTMLElement )
         {
-            return new Bounds();
+            let rect = element.getBoundingClientRect();
+            return new Sys.UI.Point( rect.left, rect.top );
         }
+
+        /**
+         * Returns a value that represents the layout characteristics of a DOM element when it is hidden by invoking the {@link Sys.UI.DomElement.setVisible} method.
+         * This member is static and can be invoked without creating an instance of the class.
+         * @param element
+         *      The target DOM element.
+         * @returns
+         *      A {@link Sys.UI.VisibilityMode} enumeration value that indicates the layout characteristics of element when it is hidden by invoking the setVisible method.
+         */
+        public static getVisibilityMode( element: HTMLElement )
+        {
+            return ( true ) ?
+                Sys.UI.VisibilityMode.hide :
+                Sys.UI.VisibilityMode.collapse;
+        }
+
+        // public static setVisibilityMode( element: HTMLElement, value: Sys.UI.VisibilityMode )
+        // {
+        //     Sys.UI.DomElement._ensureOldDisplayMode(element);
+        //     if (element._visibilityMode !== value) {
+        //         element._visibilityMode = value;
+        //         if (Sys.UI.DomElement.getVisible(element) === false) {
+        //             if (element._visibilityMode === Sys.UI.VisibilityMode.hide) {
+        //                 element.style.display = element._oldDisplayMode;
+        //             }
+        //             else {
+        //                 element.style.display = 'none';
+        //             }
+        //         }
+        //         element._visibilityMode = value;
+        //     }
+        // }
+
+        // public static getVisible = function( element: HTMLElement )
+        // {
+        //     var style = element.currentStyle || Sys.UI.DomElement._getCurrentStyle(element);
+        //     if (!style) return true;
+        //     return (style.visibility !== 'hidden') && (style.display !== 'none');
+        // }
+
+        // public static setVisible = function( element: HTMLElement, value: Sys.UI.VisibilityMode )
+        // {
+        //     if (value !== Sys.UI.DomElement.getVisible( element)) {
+        //         Sys.UI.DomElement._ensureOldDisplayMode(element);
+        //         element.style.visibility = value ? 'visible' : 'hidden';
+        //         if (value || (element._visibilityMode === Sys.UI.VisibilityMode.hide)) {
+        //             element.style.display = element._oldDisplayMode;
+        //         }
+        //         else {
+        //             element.style.display = 'none';
+        //         }
+        //     }
+        // }
     }
 }

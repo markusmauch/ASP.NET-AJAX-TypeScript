@@ -1,4 +1,9 @@
 
+function $create( type: { new(): Sys.Component | Sys.UI.Control }, properties: { [name: string]: any }, events: { [name: string]: any }, references, element: HTMLElement )
+{
+    debugger;
+}
+
 /**
  * Provides a shortcut to the {@link getElementById} method of the {@link Sys.UI.DomElement} class.
  * This member is static and can be invoked without creating an instance of the class.
@@ -7,7 +12,8 @@
  * @param element
  *      The parent element to search. The default is the document element.
  */
-function $get( id: string, element: HTMLElement )
+function $get( id: string, element?: HTMLElement )
 {
     return Sys.UI.DomElement.getElementById( id, element );
 }
+
