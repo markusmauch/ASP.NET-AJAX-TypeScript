@@ -1,24 +1,64 @@
 
+interface String
+{
+    format( ...args: String[] ): string;
+    localeFormat( ...args: String[] ): string;
+}
+
+String.prototype.format = function( ...args: String[] )
+{
+    return String.format( this, ...args );
+}
+
+String.prototype.localeFormat = function( ...args: String[] )
+{
+    return String.localeFormat( this, ...args );
+}
+
 interface StringConstructor
 {
-    format(format : string, args : string[]) : string;
-    _toFormattedString(useLocale : boolean, args : IArguments) : string;
+    /**
+     * Replaces each format item in a String object with the text equivalent of a corresponding object's value. 
+     * @param format
+     *      A format string.
+     * @param args
+     *      An array of objects to format.
+     */
+    format( format: string, ...args: String[] ): string;
+    
+    /**
+     * Replaces the format items in a String object with the text equivalent of a corresponding object's value. The current culture is used to format dates and numbers.
+     * @param format
+     *      A format string.
+     * @param args
+     *      An array of objects to format.
+     */
+    localeFormat( format: string, ...args: String[] ): string;
+    
+    _toFormattedString( useLocale: boolean, args: String[] ): string;
 }
 
-String.format = function (format : string, args : string[]) {
-    return String._toFormattedString(false, arguments);
+String.format = ( format: string, ...args: String[] ) =>
+{
+    return String._toFormattedString( false, args );
 }
 
-String._toFormattedString = (useLocale : boolean, args : IArguments) => {
+String.localeFormat = ( format: string, ...args: String[] ) =>
+{
+    return String._toFormattedString( true, args );
+}
+
+String._toFormattedString = ( useLocale: boolean, args: String[] ) =>
+{
     var result = "";
     var format = args[0];
     for (var i = 0;;)
     {
-        var open = format.indexOf('{', i);
-        var close = format.indexOf('}', i);
-        if ((open < 0) && (close < 0))
+        var open = format.indexOf( '{', i );
+        var close = format.indexOf( '}', i );
+        if ( (open < 0) && (close < 0) )
         {
-            result += format.slice(i);
+            result += format.slice( i );
             break;
         }
         if ( ( close > 0 ) && ( ( close < open ) || ( open < 0 ) ) )
@@ -43,31 +83,33 @@ String._toFormattedString = (useLocale : boolean, args : IArguments) => {
         {
             throw Error.argument('format', Sys.Res.stringFormatBraceMismatch);
         }
-        var brace = format.substring(i, close);
-        var colonIndex = brace.indexOf(':');
-        var argNumber = parseInt((colonIndex < 0)
+        let brace = format.substring( i, close );
+        let colonIndex = brace.indexOf( ":" );
+        let argNumber = parseInt( ( colonIndex < 0 )
             ? brace
-            : brace.substring(0, colonIndex), 10) + 1;
+            : brace.substring( 0, colonIndex ), 10 ) + 1;
         if ( isNaN( argNumber ) ) 
-            throw Error.argument( 'format', Sys.Res.stringFormatInvalid );
-        var argFormat = ( colonIndex < 0 )
+            throw Error.argument( "format", Sys.Res.stringFormatInvalid );
+        let argFormat = ( colonIndex < 0 )
             ? ''
-            : brace.substring(colonIndex + 1);
-        var arg = args[argNumber];
-        if (typeof(arg) === "undefined" || arg === null) {
+            : brace.substring( colonIndex + 1 );
+        let arg = args[ argNumber ];
+        if ( typeof( arg ) === "undefined" || arg === null )
+        {
             arg = '';
         }
-        if (arg.toFormattedString)
+        // if ( arg.toFormattedString )
+        // {
+        //     result += arg.toFormattedString( argFormat );
+        // }
+        //else
+        if ( useLocale && arg.localeFormat )
         {
-            result += arg.toFormattedString(argFormat);
+            result += arg.localeFormat( argFormat );
         }
-        else if (useLocale && arg.localeFormat)
+        else if ( arg.format )
         {
-            result += arg.localeFormat(argFormat);
-        }
-        else if (arg.format)
-        {
-            result += arg.format(argFormat);
+            result += arg.format( argFormat );
         }
         else 
         {

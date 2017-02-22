@@ -1,4 +1,9 @@
 
 let ctrl = $get( "Control" );
 
-//$create( Sys.Component,  )
+
+class Test extends Sys.Component
+{
+}
+
+Sys.Component.create<Test>( Test, null, null, null, $get( "Container" ) );

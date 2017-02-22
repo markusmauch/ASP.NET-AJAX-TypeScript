@@ -67,7 +67,7 @@ module Sys.UI
          */
         public static getElementById( id: string, element?: HTMLElement )
         {
-            return ( element || document ).querySelector( "#" + id );
+            return ( element || document ).querySelector( "#" + id ) as HTMLElement;
         }
 
         /**

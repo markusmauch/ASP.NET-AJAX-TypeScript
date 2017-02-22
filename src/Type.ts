@@ -1,7 +1,6 @@
 
 interface Function
 {
-    __typeName: string;
     getName(): string;
     isInstanceOfType( instance: any ): boolean;
     implementsInterface( interfaceType ): boolean;

@@ -1,8 +1,5 @@
 
-function $create( type: { new(): Sys.Component | Sys.UI.Control }, properties: { [name: string]: any }, events: { [name: string]: any }, references, element: HTMLElement )
-{
-    debugger;
-}
+let $create = Sys.Component.create;
 
 /**
  * Provides a shortcut to the {@link getElementById} method of the {@link Sys.UI.DomElement} class.
