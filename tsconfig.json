@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "module": "none",
+        "target": "es5",
+        "strictNullChecks": true
+    },
+    "files": [
+        "test/App.ts",
+        "src/Array.ts",
+        "src/Error.ts",
+        "src/Global.ts",
+        "src/Object.ts",
+        "src/String.ts",
+        "src/Type.ts",
+        "src/Sys/EventArgs.ts",
+        "src/Sys/EventHandlerList.ts",
+        "src/Sys/Component.ts",
+        "src/Sys/Res.ts",
+        "src/Sys/UI/Bounds.ts",
+        "src/Sys/UI/Control.ts",
+        "src/Sys/UI/DomElement.ts"
+    ]
+}
