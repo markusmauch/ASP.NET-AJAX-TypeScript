@@ -9,7 +9,7 @@ module Sys.UI
             this._element = element;
         }
 
-        private _element: HTMLElement;
+        protected _element: HTMLElement;
 
         public get_element()
         {

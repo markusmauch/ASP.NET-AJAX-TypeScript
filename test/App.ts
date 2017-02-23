@@ -57,5 +57,5 @@ interface TestEvents extends Sys.ComponentEvents
 let props: TestProps = { id: "test", title: "title", backgroundColor: "grey" };
 let events: TestEvents = { click: ( sender, args ) => { console.log( "click" ) } };
 
-let test = Sys.Component.create( Test, props, events, null, ctrl );
+let test = $create( Test, props, events, null, ctrl );
 

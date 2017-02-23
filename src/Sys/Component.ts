@@ -9,8 +9,8 @@ module Sys
         private _initialized = false;
         private _disposed = false;
         private _updating = false;
-        private _id: string;
-        private _events = new Sys.EventHandlerList();
+        protected _id: string;
+        protected _events = new Sys.EventHandlerList();
         
         /**
          * When overridden in a derived class, initializes an instance of that class and registers it with the application as a disposable object.
