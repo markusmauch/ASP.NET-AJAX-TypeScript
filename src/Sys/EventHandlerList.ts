@@ -22,7 +22,7 @@ module Sys
             let list = this._getEvent( id, true );
             if ( list !== null )
             {
-                list.push( handler );
+                Array.add( list, handler );
             }
         }
 		
@@ -49,9 +49,20 @@ module Sys
             };
         }
 		
+        /**
+         * Removes an event handler from an event in an {@libnk Sys.EventHandlerList} instance.
+         * @param id
+         *      The ID for the event.
+         * @param handler
+         *      The handler to remove from the event.
+         */
         public removeHandler( id: string, handler: EventHandler ): void
         {
-
+            let list = this._getEvent( id, true );
+            if ( list !== null )
+            {
+                Array.remove( list, handler );
+            }
         }
 
         private _getEvent( id: string, create = false ): EventHandler[] | null
