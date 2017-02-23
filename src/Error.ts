@@ -13,6 +13,8 @@ interface ErrorConstructor
     create( message: string, errorInfo: any ): Error;
 
     popStackFrame(): void;
+
+    invalidOperation( message: string ): Error;
 }
 
 Error.argument = ( paramName?: any, message?: string ) =>
@@ -69,4 +71,9 @@ Error.popStackFrame = () =>
     this.lineNumber = parseInt(nextFrameParts[2]);
     stackFrames.shift();
     this.stack = stackFrames.join("\n");
+}
+
+Error.invalidOperation = ( message: string ) =>
+{
+    return new Error();
 }

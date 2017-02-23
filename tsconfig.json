@@ -2,7 +2,8 @@
     "compilerOptions": {
         "module": "none",
         "target": "es5",
-        "strictNullChecks": true
+        "strictNullChecks": true,
+        "sourceMap": true
     },
     "files": [
         "test/App.ts",

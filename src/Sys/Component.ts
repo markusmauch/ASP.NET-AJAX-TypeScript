@@ -142,52 +142,50 @@ module Sys
         {
         }
 
-        public static create<T extends Sys.Component>( type: { new(): T; }, properties: { [name: string]: any } | null, events: { [name: string]: any } | null, references: any | null, element: HTMLElement | null )
+        public static create<C extends Sys.Component|Sys.UI.Control|Sys.UI.Behavior, P extends ComponentProps>(
+            type: { new( element?: HTMLElement ): C; },
+            properties: P | null,
+            events: { [name: string]: any } | null,
+            references: any | null,
+            element: HTMLElement | null )
         {
-            if ( type.inheritsFrom( Sys.Component ) === false )
-            {
-                throw Error.argument( "type", String.format( Sys.Res.createNotComponent, type.getName() ) );
-            }
-            if ( ( type.inheritsFrom( Sys.UI.Behavior ) || type.inheritsFrom( Sys.UI.Control ) ) && element === null )
-            {
-                throw Error.argument( "element", Sys.Res.createNoDom );
-            }
-            else if ( element )
-            {
-                throw Error.argument( "element", Sys.Res.createComponentOnDom );
-            }
-            
             let component;
-            if ( type.inheritsFrom( Sys.UI.Behavior ) )
+            if ( type.inheritsFrom( Sys.UI.Control ) || type.inheritsFrom( Sys.UI.Behavior ) )
             {
-                component = new Sys.UI.Behavior( element || new HTMLElement() );
-            }
-            else if ( type.inheritsFrom( Sys.UI.Control ) )
-            {
-                component = new Sys.UI.Control( element || new HTMLElement() );
+                if ( element === null )
+                {
+                    throw Error.argument( "element", Sys.Res.createComponentOnDom );
+                }
+                component = new type( element );
             }
             else
             {
                 component = new Sys.Component();
             }
             
-            
-            var app = Sys.Application;
+            //var app = Sys.Application;
             //var creatingComponents = app.get_isCreatingComponents();
+
             component.beginUpdate();
             
             if ( properties !== null )
             {
-                component._setProperties( properties );
+                Sys.Component._setProperties( component, properties );
             }
             
             if ( events !== null )
             {
                 for ( let name in events )
                 {
-                    //if (!(component["add_" + name] instanceof Function)) throw new Error.invalidOperation(String.format(Sys.Res.undefinedEvent, name));
-                    //if (!(events[name] instanceof Function)) throw new Error.invalidOperation(Sys.Res.eventHandlerNotFunction);
-                    component["add_" + name](events[name]);
+                    if ( !( component["add_" + name] instanceof Function ) )
+                    {
+                        throw Error.invalidOperation(String.format(Sys.Res.undefinedEvent, name));
+                    }
+                    if ( !( events[name] instanceof Function ) )
+                    {
+                        throw Error.invalidOperation(Sys.Res.eventHandlerNotFunction);
+                    }
+                    component["add_" + name]( events[name] );
                 }
             }
             
@@ -211,23 +209,83 @@ module Sys
             //     }
             //     component.endUpdate();
             // }
+
+            component.endUpdate();
+
             return component;
         }
 
-        public _setProperties( properties: ComponentProperties )
+        public static _setProperties( target: Sys.Component, properties: ComponentProps )
         {
-
+            let current;
+            let targetType = Object.getType( target );
+            let isObject = ( targetType === Object ) || ( targetType === Sys.UI.DomElement );
+            let isComponent = Sys.Component.isInstanceOfType( target ) && !target.get_isUpdating();
+            if ( isComponent ) target.beginUpdate();
+            
+            for ( let name in properties )
+            {
+                let val = properties[name];
+                let getter = isObject ? null : target["get_" + name];
+                if ( isObject || typeof( getter ) !== 'function' )
+                {
+                    let targetVal = target[name];
+                    if ( !isObject && typeof( targetVal ) === 'undefined' ) throw Error.invalidOperation( String.format(Sys.Res.propertyUndefined, name ) );
+                    if ( !val || (typeof(val) !== 'object') || ( isObject && !targetVal ) )
+                    {
+                        target[name] = val;
+                    }
+                    else
+                    {
+                        Sys.Component._setProperties( targetVal, val );
+                    }
+                }
+                else
+                {
+                    let setter = target["set_" + name];
+                    if ( typeof( setter ) === 'function' )
+                    {
+                        setter.apply( target, [val] );
+                    }
+                    else if ( val instanceof Array )
+                    {
+                        current = getter.apply( target );
+                        if ( !( current instanceof Array ) )
+                        {
+                            throw Error.invalidOperation( String.format( Sys.Res.propertyNotAnArray, name ) );
+                        }
+                        for ( let i = 0, j = current.length, l= val.length; i < l; i++, j++ )
+                        {
+                            current[j] = val[i];
+                        }
+                    }
+                    else if ( ( typeof( val ) === 'object' ) && ( Object.getType( val ) === Object ) )
+                    {
+                        current = getter.apply(target);
+                        if ( ( typeof( current ) === 'undefined' ) || ( current === null ) )
+                        {
+                            throw Error.invalidOperation( String.format( Sys.Res.propertyNullOrUndefined, name ) );
+                        }
+                        Sys.Component._setProperties( current, val );
+                    }
+                    else
+                    {
+                        throw Error.invalidOperation( String.format( Sys.Res.propertyNotWritable, name ) );
+                    }
+                }
+            }
+            if ( isComponent ) target.endUpdate();
         }
     }
 
-    export interface ComponentProperties
+    export interface ComponentProps
     {
         id: string;
     }
 
     export interface ComponentEvents
     {
-        disposing: Sys.EventHandler;
-        propertyChanged: Sys.EventHandler;
+        disposing?: Sys.EventHandler;
+        propertyChanged?: Sys.EventHandler;
     }
 }
