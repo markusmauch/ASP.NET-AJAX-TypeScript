@@ -8,7 +8,7 @@ interface ObjectConstructor
 Object.getType = ( instance: any ) =>
 {
     let ctor = instance.constructor;
-    if ( !ctor || ( typeof( ctor ) !== "function" ) || !ctor.__typeName || ( ctor.__typeName === 'Object' ) )
+    if ( !ctor || ( typeof( ctor ) !== "function" ) )
     {
         return Object;
     }

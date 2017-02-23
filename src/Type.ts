@@ -2,8 +2,38 @@
 interface Function
 {
     getName(): string;
+    
+    /**
+     * Returns a value that indicates whether an object is an instance of this Type or of one of it's parent Types.
+     * @param instance
+     *      The object to test.
+     * @returns
+     *      true if instance is an instance of this Type or of one of it's parent Types; false if instance does not implement the interface, or if it is undefined or null.
+     * @example
+     *      let component = new Sys.Component();
+     *      let control = new Sys.UI.Control( document.body );
+     *      Sys.Component.isInstanceOfType( component ); // true
+     *      Sys.Component.isInstanceOfType( control ); // true
+     *      Sys.UI.Control.isInstanceOfType( component ); // false
+     *      Sys.UI.Control.isInstanceOfType( control ); // true
+     *      
+     */
     isInstanceOfType( instance: any ): boolean;
+    
     implementsInterface( interfaceType: Function ): boolean;
+    
+    /**
+     * Determines whether this Type inherits from a specified Type.
+     * @param parentType
+     *      The fully qualified name of the Type to test as a base class for the current Type.
+     * @returns
+     *      true if this Type inherits from parentType; otherwise, false.
+     * @example
+     *    Sys.Component.inheritsFrom( Sys.Component ); // false
+     *    Sys.Component.inheritsFrom( Sys.UI.Control ); // false
+     *    Sys.UI.Control.inheritsFrom( Sys.Component ); // true
+     *    Sys.UI.Control.inheritsFrom( Sys.UI.Control ); // false
+     */
     inheritsFrom( parentType: Function ): boolean;
 }
 
@@ -17,14 +47,14 @@ Function.prototype.isInstanceOfType = function( instance: any )
     return instance instanceof this;
 }
 
-Function.implementsInterface = function( interfaceType: Function )
+Function.prototype.implementsInterface = function( interfaceType: Function )
 {
 	return this instanceof interfaceType;
 }
 
-Function.inheritsFrom = function( parentType: Function )
+Function.prototype.inheritsFrom = function( parentType: Function )
 {
-	return this instanceof parentType;
+    return this.prototype instanceof parentType;
 }
 
-const Type = Function;
+let Type = Function;
