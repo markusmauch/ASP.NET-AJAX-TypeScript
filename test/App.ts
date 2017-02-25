@@ -15,6 +15,14 @@ class Test extends Sys.UI.Control
             let h = this.get_events().getHandler( "click" );
             if ( h !== null ) h( this );
         } );
+
+        let sb = new Sys.StringBuilder( "Hallo" );
+        sb.appendLine( "Hallo" );
+        sb.append( "Welt" );
+        console.log( sb.toString() );
+        console.log( sb.isEmpty() );
+        sb.clear();
+        console.log( sb.isEmpty() );
     }
 
     public get_title()
@@ -59,3 +67,14 @@ let events: TestEvents = { click: ( sender, args ) => { console.log( "click" ) }
 
 let test = $create( Test, props, events, null, ctrl );
 
+
+console.log( "UA: " + ( Sys.Browser.agent === Sys.Browser.Safari ) )
+
+let request = new Sys.Net.WebRequest();
+request.set_url( "http://localhost:3000/asp.net.ajax/tsconfig.json" );
+request.set_httpVerb( "GET" );
+request.add_completed( ( sender, args ) =>
+{
+    console.log( "OK" );
+} );
+request.invoke();

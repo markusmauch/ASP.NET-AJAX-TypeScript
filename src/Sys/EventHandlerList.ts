@@ -1,7 +1,7 @@
 
 module Sys
 {
-    export type EventHandler = ( sender: Sys.Component, args?: EventArgs ) => void;
+    export type EventHandler = ( sender: any, args?: EventArgs ) => void;
     
     /**
      * Creates a dictionary of client events for a component, with event names as keys and the associated handlers as values.

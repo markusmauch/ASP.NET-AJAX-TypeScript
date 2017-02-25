@@ -1,5 +1,8 @@
 module Sys
 {
+    /**
+     * Provides static, culture-neutral exception messages that are used by the Microsoft Ajax Library framework.
+     */
     export var Res = {
         'argumentTypeName': 'Value is not the name of an existing type.',
         'cantBeCalledAfterDispose': 'Can\'t be called after dispose.',

@@ -3,6 +3,15 @@ interface String
 {
     format( ...args: String[] ): string;
     localeFormat( ...args: String[] ): string;
+    
+    /**
+     * Determines whether the start of a String object matches a specified string.
+     * @param prefix
+     *      The string to match with the start of the String object.
+     * @returns
+     *      true if the start of the String object matches prefix; otherwise, false.
+     */
+    startsWith( prefix: string): boolean;
 }
 
 String.prototype.format = function( ...args: String[] )
@@ -13,6 +22,11 @@ String.prototype.format = function( ...args: String[] )
 String.prototype.localeFormat = function( ...args: String[] )
 {
     return String.localeFormat( this, ...args );
+}
+
+String.prototype.startsWith = function( prefix: string)
+{
+    return ( this.substr( 0, prefix.length ) === prefix );
 }
 
 interface StringConstructor
