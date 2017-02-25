@@ -1,8 +1,6 @@
 module Sys.Net
 {
-	export var WebRequestManager = new _WebRequestManager();
-
-    class _WebRequestManager
+	class _WebRequestManager
 	{
 		private _defaultTimeout: number;
 
@@ -100,4 +98,6 @@ module Sys.Net
 			}
 		}
 	}
+
+	export var WebRequestManager = new _WebRequestManager();
 }
