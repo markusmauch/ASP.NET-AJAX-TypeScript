@@ -3,7 +3,6 @@ module Sys.Net
     export class XMLHttpExecutor extends WebRequestExecutor
     {
         private _xmlHttpRequest: XMLHttpRequest;
-        private _webRequest: WebRequest;
         private _responseAvailable = false;
         private _timedOut = false;
         private _timer: number;

@@ -2,8 +2,8 @@ module Sys.Net
 {
 	export abstract class WebRequestExecutor
 	{
-		private _webRequest: WebRequest;
-		private _resultObject = null;
+		protected _webRequest: WebRequest;
+		protected _resultObject = null;
 
 		public get_webRequest()
 		{
@@ -25,7 +25,7 @@ module Sys.Net
 
 		public abstract get_responseData(): string;
 
-		public abstract get_statusCode(): string;
+		public abstract get_statusCode(): number;
 
 		public abstract get_statusText(): string;
 

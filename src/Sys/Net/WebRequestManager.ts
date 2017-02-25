@@ -2,15 +2,10 @@ module Sys.Net
 {
 	class _WebRequestManager
 	{
-		private _defaultTimeout: number;
-
-		private _events = new Sys.EventHandlerList();
+		private _defaultTimeout = 0;
 		private _defaultExecutorType = "Sys.Net.XMLHttpExecutor";
 
-		constructor()
-		{
-
-		}
+		private _events = new Sys.EventHandlerList();
 
 		public add_invokingRequest( handler: EventHandler )
 		{
