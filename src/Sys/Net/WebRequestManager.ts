@@ -96,7 +96,7 @@ module Sys.Net
 			}
 			if ( !evArgs.get_cancel() )
 			{
-				executor.executeRequest();
+				//executor.executeRequest(); // TODO
 			}
 		}
 	}

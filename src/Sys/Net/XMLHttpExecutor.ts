@@ -1,4 +1,4 @@
-module Sys.Net
+/*module Sys.Net
 {
 	export class XMLHttpExecutor extends WebRequestExecutor
 	{
@@ -163,3 +163,4 @@ module Sys.Net
 		}
 	}
 }
+*/
