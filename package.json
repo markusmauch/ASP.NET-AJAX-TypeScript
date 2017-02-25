@@ -1,0 +1,30 @@
+{
+  "name": "asp.net.ajax.ts",
+  "version": "1.0.0",
+  "description": "TypeScript port of the ASP.NET AJAX framework",
+  "main": "test/index.html",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/markusmauch/asp.net.ajax.ts.git"
+  },
+  "keywords": [
+    "ASP.NET",
+    "AJAX",
+    "TypeScript"
+  ],
+  "author": "Markus Mauch",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/markusmauch/asp.net.ajax.ts/issues"
+  },
+  "homepage": "https://github.com/markusmauch/asp.net.ajax.ts",
+  "devDependencies": {
+    "express": "^4.14.1"
+  }
+}
