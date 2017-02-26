@@ -1,4 +1,3 @@
-
 module Sys.UI
 {
     export class Control extends Sys.Component
@@ -18,6 +17,5 @@ module Sys.UI
     }
 
     export interface ControlProps extends ComponentProps
-    {
-    }
+    {}
 }

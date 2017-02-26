@@ -1,4 +1,3 @@
-
 module Sys.UI
 {
     export class Bounds
@@ -15,7 +14,6 @@ module Sys.UI
          *    The height in pixels.
          */
         constructor( public x = 0, public y = 0, public width = 0, public height = 0 )
-        {
-        }
+        {}
     }
 }

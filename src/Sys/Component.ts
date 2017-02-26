@@ -1,4 +1,3 @@
-
 module Sys
 {
     /**
@@ -11,7 +10,7 @@ module Sys
         private _updating = false;
         protected _id: string;
         protected _events = new Sys.EventHandlerList();
-        
+
         /**
          * When overridden in a derived class, initializes an instance of that class and registers it with the application as a disposable object.
          */
@@ -54,7 +53,7 @@ module Sys
         {
             return this._initialized;
         }
-        
+
         /**
          * Gets a value indicating whether the current Component object is updating.
          * @returns
@@ -82,7 +81,7 @@ module Sys
          */
         public remove_disposing( handler )
         {
-            this.get_events().removeHandler("disposing", handler);
+            this.get_events().removeHandler( "disposing", handler );
         }
 
         /**
@@ -92,7 +91,7 @@ module Sys
          */
         public add_propertyChanged( handler )
         {
-            this.get_events().addHandler("propertyChanged", handler);
+            this.get_events().addHandler( "propertyChanged", handler );
         }
 
         /**
@@ -137,15 +136,20 @@ module Sys
         {
             this._initialized = true;
         }
-        
-        public updated()
-        {
-        }
 
-        public static create<C extends Sys.Component|Sys.UI.Control|Sys.UI.Behavior, P extends ComponentProps>(
-            type: { new( element?: HTMLElement ): C; },
+        public updated()
+        {}
+
+        public static create < C extends Sys.Component | Sys.UI.Control | Sys.UI.Behavior, P extends ComponentProps > (
+            type:
+            {
+                new( element ? : HTMLElement ): C;
+            },
             properties: P | null,
-            events: { [name: string]: any } | null,
+            events:
+            {
+                [ name: string ]: any
+            } | null,
             references: any | null,
             element: HTMLElement | null )
         {
@@ -162,33 +166,33 @@ module Sys
             {
                 component = new Sys.Component();
             }
-            
+
             //var app = Sys.Application;
             //var creatingComponents = app.get_isCreatingComponents();
 
             component.beginUpdate();
-            
+
             if ( properties !== null )
             {
                 Sys.Component._setProperties( component, properties );
             }
-            
+
             if ( events !== null )
             {
                 for ( let name in events )
                 {
-                    if ( !( component["add_" + name] instanceof Function ) )
+                    if ( !( component[ "add_" + name ] instanceof Function ) )
                     {
-                        throw Error.invalidOperation(String.format(Sys.Res.undefinedEvent, name));
+                        throw Error.invalidOperation( String.format( Sys.Res.undefinedEvent, name ) );
                     }
-                    if ( !( events[name] instanceof Function ) )
+                    if ( !( events[ name ] instanceof Function ) )
                     {
-                        throw Error.invalidOperation(Sys.Res.eventHandlerNotFunction);
+                        throw Error.invalidOperation( Sys.Res.eventHandlerNotFunction );
                     }
-                    component["add_" + name]( events[name] );
+                    component[ "add_" + name ]( events[ name ] );
                 }
             }
-            
+
             // if ( component.get_id() )
             // {
             //     app.addComponent(component);
@@ -222,18 +226,18 @@ module Sys
             let isObject = ( targetType === Object ) || ( targetType === Sys.UI.DomElement );
             let isComponent = Sys.Component.isInstanceOfType( target ) && !target.get_isUpdating();
             if ( isComponent ) target.beginUpdate();
-            
+
             for ( let name in properties )
             {
-                let val = properties[name];
-                let getter = isObject ? null : target["get_" + name];
+                let val = properties[ name ];
+                let getter = isObject ? null : target[ "get_" + name ];
                 if ( isObject || typeof( getter ) !== 'function' )
                 {
-                    let targetVal = target[name];
-                    if ( !isObject && typeof( targetVal ) === 'undefined' ) throw Error.invalidOperation( String.format(Sys.Res.propertyUndefined, name ) );
-                    if ( !val || (typeof(val) !== 'object') || ( isObject && !targetVal ) )
+                    let targetVal = target[ name ];
+                    if ( !isObject && typeof( targetVal ) === 'undefined' ) throw Error.invalidOperation( String.format( Sys.Res.propertyUndefined, name ) );
+                    if ( !val || ( typeof( val ) !== 'object' ) || ( isObject && !targetVal ) )
                     {
-                        target[name] = val;
+                        target[ name ] = val;
                     }
                     else
                     {
@@ -242,10 +246,10 @@ module Sys
                 }
                 else
                 {
-                    let setter = target["set_" + name];
+                    let setter = target[ "set_" + name ];
                     if ( typeof( setter ) === 'function' )
                     {
-                        setter.apply( target, [val] );
+                        setter.apply( target, [ val ] );
                     }
                     else if ( val instanceof Array )
                     {
@@ -254,14 +258,14 @@ module Sys
                         {
                             throw Error.invalidOperation( String.format( Sys.Res.propertyNotAnArray, name ) );
                         }
-                        for ( let i = 0, j = current.length, l= val.length; i < l; i++, j++ )
+                        for ( let i = 0, j = current.length, l = val.length; i < l; i++, j++ )
                         {
-                            current[j] = val[i];
+                            current[ j ] = val[ i ];
                         }
                     }
                     else if ( ( typeof( val ) === 'object' ) && ( Object.getType( val ) === Object ) )
                     {
-                        current = getter.apply(target);
+                        current = getter.apply( target );
                         if ( ( typeof( current ) === 'undefined' ) || ( current === null ) )
                         {
                             throw Error.invalidOperation( String.format( Sys.Res.propertyNullOrUndefined, name ) );
@@ -285,7 +289,7 @@ module Sys
 
     export interface ComponentEvents
     {
-        disposing?: Sys.EventHandler<Sys.Component, Sys.EventArgs>;
-        propertyChanged?: Sys.EventHandler<Sys.Component, Sys.EventArgs>;
+        disposing ? : Sys.EventHandler < Sys.Component, Sys.EventArgs > ;
+        propertyChanged ? : Sys.EventHandler < Sys.Component, Sys.EventArgs > ;
     }
 }

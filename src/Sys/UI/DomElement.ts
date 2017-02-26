@@ -1,4 +1,3 @@
-
 module Sys.UI
 {
     export class DomElement
@@ -36,7 +35,7 @@ module Sys.UI
          * @returns
          *      true if the element contains the specified CSS class; otherwise, false.
          */
-        public static containsCssClass ( element: HTMLElement, className: string )
+        public static containsCssClass( element: HTMLElement, className: string )
         {
             return Array.contains( element.className.split( " " ), className );
         }
@@ -54,7 +53,7 @@ module Sys.UI
             let rect = element.getBoundingClientRect();
             return new Sys.UI.Bounds( rect.left, rect.top, rect.width, rect.height );
         }
-        
+
         /**
          * Gets a DOM element that has the specified id attribute.
          * This member is static and can be invoked without creating an instance of the class.
@@ -65,7 +64,7 @@ module Sys.UI
          * @returns
          *      The {@link HTMLElement} object with the specified ID.
          */
-        public static getElementById( id: string, element?: HTMLElement )
+        public static getElementById( id: string, element ? : HTMLElement )
         {
             return ( element || document ).querySelector( "#" + id ) as HTMLElement;
         }
