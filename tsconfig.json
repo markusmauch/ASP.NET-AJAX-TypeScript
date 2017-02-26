@@ -27,6 +27,8 @@
         "src/Sys/Net/WebRequestManager.ts",
         "src/Sys/Net/NetworkRequestEventArgs.ts",
         "src/Sys/Net/XMLDOM.ts",
+        "src/Sys/Net/WebServiceError.ts",
+        "src/Sys/Net/WebServiceProxy.ts",
         "src/Sys/Serialization/JavaScriptSerializer.ts",
         "src/Sys/UI/Behavior.ts",
         "src/Sys/UI/Bounds.ts",
