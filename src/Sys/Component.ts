@@ -102,7 +102,7 @@ module Sys
          */
         public remove_propertyChanged( handler )
         {
-            this.get_events().removeHandler("propertyChanged", handler);
+            this.get_events().removeHandler( "propertyChanged", handler );
         }
 
         /**
@@ -285,7 +285,7 @@ module Sys
 
     export interface ComponentEvents
     {
-        disposing?: Sys.EventHandler;
-        propertyChanged?: Sys.EventHandler;
+        disposing?: Sys.EventHandler<Sys.Component, Sys.EventArgs>;
+        propertyChanged?: Sys.EventHandler<Sys.Component, Sys.EventArgs>;
     }
 }

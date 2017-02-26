@@ -1,3 +1,21 @@
+interface FunctionConstructor
+{
+    /**
+     * Creates a delegate function that retains the context initially used during an objects creation.
+     * @param instance
+     *      
+     * @param method
+     *      
+     * @returns
+     *      The delegate function.
+     */
+    createDelegate( instance: any, method: Function ): Function;
+    
+    /**
+     * A function that does nothing.
+     */
+    emptyMethod: () => void;
+}
 
 interface Function
 {
@@ -36,6 +54,16 @@ interface Function
      */
     inheritsFrom( parentType: Function ): boolean;
 }
+
+Function.createDelegate = ( instance: any, method: Function ) =>
+{
+    return function()
+    {
+        return method.apply( instance, arguments );
+    }
+}
+
+Function.emptyMethod = () => {};
 
 Function.prototype.getName = function()
 {

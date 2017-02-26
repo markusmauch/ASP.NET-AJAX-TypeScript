@@ -29,7 +29,7 @@ module Sys.Net
 
 		public abstract get_statusText(): string;
 
-		public abstract get_xml(): string;
+		public abstract get_xml(): Document | null;
 
 		public get_object()
 		{
@@ -39,5 +39,7 @@ module Sys.Net
 			}
 			return this._resultObject;
 		}
+
+		public abstract executeRequest();
 	}
 }

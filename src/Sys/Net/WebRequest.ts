@@ -10,7 +10,7 @@ module Sys.Net
         private _url = "";
 		private _headers: HttpHeaders = {};
 		private _body: string;
-		private _userContext: any = null;
+		private _userContext: any;
 		private _httpVerb: HttpVerb;
 		private _executor: WebRequestExecutor;
 		private _invokeCalled = false;
@@ -23,7 +23,7 @@ module Sys.Net
 		 * @param handler
 		 * 		The function registered to handle the completed request event.
 		 */
-		public add_completed( handler: EventHandler )
+		public add_completed( handler: EventHandler<WebRequestExecutor, Sys.EventArgs> )
 		{
 			this._get_eventHandlerList().addHandler( "completed", handler );
 		}
@@ -33,7 +33,7 @@ module Sys.Net
 		 * @param handler
 		 * 		The function registered to handle the completed request event.
 		 */
-		public remove_completed( handler: EventHandler )
+		public remove_completed( handler: EventHandler<WebRequestExecutor, Sys.EventArgs> )
 		{
 			this._get_eventHandlerList().removeHandler( "completed", handler );
 		}
@@ -181,7 +181,7 @@ module Sys.Net
 		 */
 		public set_executor( value: Sys.Net.WebRequestExecutor )
 		{
-			if ( this._executor !== null && this._executor.get_started() )
+			if ( this._executor !== undefined && this._executor.get_started() )
 			{
 				throw Error.invalidOperation( Sys.Res.setExecutorAfterActive );
 			}

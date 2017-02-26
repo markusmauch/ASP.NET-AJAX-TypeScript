@@ -14,6 +14,15 @@
             "command": "gulp",
             "args": ["build"],
             "isShellCommand": true
+        },
+        {
+            "taskName": "serve",
+            "command": "node",
+            "args": [
+                "server.js"
+            ],
+            "isBackground": true,
+            "isShellCommand": true
         }
     ]
 }

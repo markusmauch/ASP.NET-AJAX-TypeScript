@@ -1,3 +1,9 @@
+interface XmlDomDocument extends Document
+{
+    setProperty( name: string, value: string ): void;
+}
+
+
 module Sys.Net
 {
     export class XMLHttpExecutor extends WebRequestExecutor
@@ -36,11 +42,11 @@ module Sys.Net
 
         public get_responseData()
         {
-            if ( this._responseAvailable )
+            if ( this._responseAvailable == false )
             {
                 throw Error.invalidOperation( String.format( Sys.Res.cannotCallBeforeResponse, 'get_responseData' ) );
             }
-            if ( !this._xmlHttpRequest )
+            if ( this._xmlHttpRequest === undefined )
             {
                 throw Error.invalidOperation( String.format( Sys.Res.cannotCallOutsideHandler, 'get_responseData' ) );
             }
@@ -53,7 +59,7 @@ module Sys.Net
             {
                 throw Error.invalidOperation( String.format( Sys.Res.cannotCallBeforeResponse, 'get_statusCode' ) );
             }
-            if ( !this._xmlHttpRequest )
+            if ( this._xmlHttpRequest === undefined )
             {
                 throw Error.invalidOperation( String.format( Sys.Res.cannotCallOutsideHandler, 'get_statusCode' ) );
             }
@@ -73,7 +79,7 @@ module Sys.Net
             {
                 throw Error.invalidOperation( String.format( Sys.Res.cannotCallBeforeResponse, 'get_statusText' ) );
             }
-            if ( !this._xmlHttpRequest )
+            if ( this._xmlHttpRequest === undefined )
             {
                 throw Error.invalidOperation( String.format( Sys.Res.cannotCallOutsideHandler, 'get_statusText' ) );
             }
@@ -86,7 +92,7 @@ module Sys.Net
             {
                 throw Error.invalidOperation( String.format( Sys.Res.cannotCallBeforeResponse, 'get_xml' ) );
             }
-            if ( !this._xmlHttpRequest )
+            if ( this._xmlHttpRequest === undefined )
             {
                 throw Error.invalidOperation( String.format( Sys.Res.cannotCallOutsideHandler, 'get_xml' ) );
             }
@@ -99,7 +105,8 @@ module Sys.Net
             }
             else if ( navigator.userAgent.indexOf( 'MSIE' ) !== -1 )
             {
-                xml.setProperty( 'SelectionLanguage', 'XPath' );
+                let xmlDomDocument = xml as XmlDomDocument;
+                xmlDomDocument.setProperty( 'SelectionLanguage', 'XPath' );
             }
             if ( xml.documentElement.namespaceURI === "http://www.mozilla.org/newlayout/xml/parsererror.xml" &&
                 xml.documentElement.tagName === "parsererror" )
@@ -107,7 +114,7 @@ module Sys.Net
                 return null;
             }
 
-            if ( xml.documentElement.firstChild && xml.documentElement.firstChild.tagName === "parsererror" )
+            if ( xml.documentElement.firstChild && xml.documentElement.firstChild.nodeName === "parsererror" )
             {
                 return null;
             }
@@ -121,7 +128,7 @@ module Sys.Net
             {
                 try
                 {
-                    if ( typeof( this._xmlHttpRequest.status ) === "undefined" )
+                    if ( this._xmlHttpRequest.status === undefined )
                     {
                         return;
                     }
@@ -158,6 +165,108 @@ module Sys.Net
             {
                 window.clearTimeout( this._timer );
                 delete this._timer;
+            }
+        }
+
+        public executeRequest()
+        {
+            if ( this._started )
+            {
+                throw Error.invalidOperation( String.format( Sys.Res.cannotCallOnceStarted, 'executeRequest' ) );
+            }
+            if ( this._webRequest === null )
+            {
+                throw Error.invalidOperation( Sys.Res.nullWebRequest );
+            }
+            var body = this._webRequest.get_body();
+            var headers = this._webRequest.get_headers();
+            this._xmlHttpRequest = new XMLHttpRequest();
+            
+            //this._xmlHttpRequest.addEventListener( "readyStateChange", this._onReadyStateChange );
+            this._xmlHttpRequest.onreadystatechange = () => { this._onReadyStateChange(); };
+            var verb = this._webRequest.get_httpVerb();
+            this._xmlHttpRequest.open( verb, this._webRequest.getResolvedUrl(), true );
+            this._xmlHttpRequest.setRequestHeader( "X-Requested-With", "XMLHttpRequest" );
+            if ( headers )
+            {
+                for ( var header in headers )
+                {
+                    var val = headers[ header ];
+                    if ( typeof( val ) !== "function" )
+                        this._xmlHttpRequest.setRequestHeader( header, val );
+                }
+            }
+            if ( verb.toLowerCase() === "post" )
+            {
+                if ( ( headers === null ) || !headers[ 'Content-Type' ] )
+                {
+                    this._xmlHttpRequest.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded; charset=utf-8' );
+                }
+                if ( !body )
+                {
+                    body = "";
+                }
+            }
+            var timeout = this._webRequest.get_timeout();
+            if ( timeout > 0 )
+            {
+                this._timer = window.setTimeout( Function.createDelegate( this, this._onTimeout ), timeout );
+            }
+            this._xmlHttpRequest.send( body );
+            this._started = true;
+        }
+
+        public getResponseHeader( header )
+        {
+            if ( !this._responseAvailable )
+            {
+                throw Error.invalidOperation( String.format( Sys.Res.cannotCallBeforeResponse, 'getResponseHeader' ) );
+            }
+            if ( !this._xmlHttpRequest )
+            {
+                throw Error.invalidOperation( String.format( Sys.Res.cannotCallOutsideHandler, 'getResponseHeader' ) );
+            }
+            var result;
+            try
+            {
+                result = this._xmlHttpRequest.getResponseHeader( header );
+            }
+            catch ( e )
+            {}
+            if ( !result ) result = "";
+            return result;
+        }
+
+        public getAllResponseHeaders()
+        {
+            if ( !this._responseAvailable )
+            {
+                throw Error.invalidOperation( String.format( Sys.Res.cannotCallBeforeResponse, 'getAllResponseHeaders' ) );
+            }
+            if ( !this._xmlHttpRequest )
+            {
+                throw Error.invalidOperation( String.format( Sys.Res.cannotCallOutsideHandler, 'getAllResponseHeaders' ) );
+            }
+            return this._xmlHttpRequest.getAllResponseHeaders();
+        }
+
+        public abort()
+        {
+            if ( !this._started )
+            {
+                throw Error.invalidOperation( Sys.Res.cannotAbortBeforeStart );
+            }
+            if ( this._aborted || this._responseAvailable || this._timedOut )
+                return;
+            this._aborted = true;
+            this._clearTimer();
+            if ( this._xmlHttpRequest && !this._responseAvailable )
+            {
+                this._xmlHttpRequest.onreadystatechange = Function.emptyMethod;
+                this._xmlHttpRequest.abort();
+
+                delete this._xmlHttpRequest;
+                this._webRequest.completed( Sys.EventArgs.Empty );
             }
         }
     }

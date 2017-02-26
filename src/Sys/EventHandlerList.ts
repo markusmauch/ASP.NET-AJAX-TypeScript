@@ -1,14 +1,14 @@
 
 module Sys
 {
-    export type EventHandler = ( sender: any, args?: EventArgs ) => void;
+    export type EventHandler<TSender, TArgs> = ( sender: TSender, args?: EventArgs ) => void;
     
     /**
      * Creates a dictionary of client events for a component, with event names as keys and the associated handlers as values.
      */
-    export class EventHandlerList
+    export class EventHandlerList<TSender, TArgs>
     {
-        private _list: { [id: string]: EventHandler[] } = {};
+        private _list: { [id: string]: EventHandler<TSender, TArgs>[] } = {};
 
         /**
          * Attaches a handler to an event in an {@link Sys.EventHandlerList} instance and adds the event to the list if it is not already present.
@@ -17,7 +17,7 @@ module Sys
          * @param handler
          *      The name of the method to handle the event.
          */
-        public addHandler( id: string, handler: EventHandler ): void
+        public addHandler( id: string, handler: EventHandler<TSender, TArgs> ): void
         {
             let list = this._getEvent( id, true );
             if ( list !== null )
@@ -33,18 +33,21 @@ module Sys
          * @returns
          *      A single method that can be invoked to call all handlers sequentially for the specified event.
          */
-        public getHandler( id: string ): EventHandler | null
+        public getHandler( id: string ): EventHandler<TSender, TArgs> | null
         {
             let evt = this._getEvent( id );
             if ( !evt || ( evt.length === 0 ) ) return null;
             
             let clone = Array.clone( evt ) || [];
-            return ( source, args? ) =>
+            return ( sender: TSender, args?: TArgs ) =>
             {
-                args = args || new Sys.EventArgs();
+                //if ( args === undefined )
+                //{
+                    //args = {};
+                //}
                 for ( let i = 0, l = clone.length; i < l; i++ )
                 {
-                    clone[i]( source, args );
+                    clone[i]( sender, args );
                 }
             };
         }
@@ -56,7 +59,7 @@ module Sys
          * @param handler
          *      The handler to remove from the event.
          */
-        public removeHandler( id: string, handler: EventHandler ): void
+        public removeHandler( id: string, handler: EventHandler<TSender, TArgs> ): void
         {
             let list = this._getEvent( id, true );
             if ( list !== null )
@@ -65,7 +68,7 @@ module Sys
             }
         }
 
-        private _getEvent( id: string, create = false ): EventHandler[] | null
+        private _getEvent( id: string, create = false ): EventHandler<TSender, TArgs>[] | null
         {
             if ( this._list[id] === undefined )
             {

@@ -12,7 +12,7 @@
         "src/Global.ts",
         "src/Object.ts",
         "src/String.ts",
-        "src/Type.ts",
+        "src/Function.ts",
         "src/Sys/Application.ts",
         "src/Sys/Browser.ts",
         "src/Sys/EventArgs.ts",

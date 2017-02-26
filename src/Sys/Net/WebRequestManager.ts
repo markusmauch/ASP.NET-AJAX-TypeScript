@@ -3,26 +3,26 @@ module Sys.Net
 	class _WebRequestManager
 	{
 		private _defaultTimeout = 0;
-		private _defaultExecutorType = "Sys.Net.XMLHttpExecutor";
+		private _defaultExecutorType = Sys.Net.XMLHttpExecutor;
 
 		private _events = new Sys.EventHandlerList();
 
-		public add_invokingRequest( handler: EventHandler )
+		public add_invokingRequest( handler: EventHandler<_WebRequestManager, Sys.Net.NetworkRequestEventArgs> )
 		{
 			this._get_eventHandlerList().addHandler( "invokingRequest", handler );
 		}
 
-		public remove_invokingRequest( handler: EventHandler )
+		public remove_invokingRequest( handler: EventHandler<_WebRequestManager, Sys.Net.NetworkRequestEventArgs> )
 		{
 			this._get_eventHandlerList().removeHandler( "invokingRequest", handler );
 		}
 
-		public add_completedRequest( handler: EventHandler )
+		public add_completedRequest( handler: EventHandler<_WebRequestManager, Sys.Net.NetworkRequestEventArgs> )
 		{
 			this._get_eventHandlerList().addHandler( "completedRequest", handler );
 		}
 
-		public remove_completedRequest( handler: EventHandler )
+		public remove_completedRequest( handler: EventHandler<_WebRequestManager, Sys.Net.NetworkRequestEventArgs> )
 		{
 			this._get_eventHandlerList().removeHandler( "completedRequest", handler );
 		}
@@ -64,8 +64,7 @@ module Sys.Net
 				let failed = false;
 				try
 				{
-					let executorType = eval( this._defaultExecutorType );
-					executor = new executorType();
+					executor = new this._defaultExecutorType();
 				}
 				catch ( e )
 				{
@@ -73,7 +72,7 @@ module Sys.Net
 				}
 				if ( failed || !Sys.Net.WebRequestExecutor.isInstanceOfType( executor ) || !executor )
 				{
-					throw Error.argument( "defaultExecutorType", String.format( Sys.Res.invalidExecutorType, this._defaultExecutorType ) );
+					throw Error.argument( "defaultExecutorType", String.format( Sys.Res.invalidExecutorType, this._defaultExecutorType.toString() ) );
 				}
 				webRequest.set_executor( executor );
 			}
@@ -89,7 +88,7 @@ module Sys.Net
 			}
 			if ( !evArgs.get_cancel() )
 			{
-				//executor.executeRequest(); // TODO
+				executor.executeRequest();
 			}
 		}
 	}
