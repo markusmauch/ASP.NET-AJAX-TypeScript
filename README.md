@@ -1,5 +1,6 @@
 # asp.net.ajax.ts
-TypeScript port ot the Microsoft ASP.NET AJAX framework (MicrosoftAjax.js)
+
+## TypeScript port ot the Microsoft ASP.NET AJAX framework (MicrosoftAjax.js)
 
 This is a complete reimplmentation of the ASP.NET Ajax framework using TypeScript.
 The goal of this project is to be as compatible as possible with the API of the original framework while the implementation behind the API is being refactored and optimized.
