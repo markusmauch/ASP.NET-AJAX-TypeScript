@@ -15,6 +15,7 @@
         "src/Function.ts",
         "src/Sys/Application.ts",
         "src/Sys/Browser.ts",
+        "src/Sys/CultureInfo.ts",
         "src/Sys/EventArgs.ts",
         "src/Sys/CancelEventArgs.ts",
         "src/Sys/EventHandlerList.ts",
@@ -30,11 +31,13 @@
         "src/Sys/Net/WebServiceError.ts",
         "src/Sys/Net/WebServiceProxy.ts",
         "src/Sys/Serialization/JavaScriptSerializer.ts",
+        "src/Sys/UI/Key.ts",
+        "src/Sys/UI/MouseButton.ts",
+        "src/Sys/UI/VisibilityMode.ts",
         "src/Sys/UI/Behavior.ts",
         "src/Sys/UI/Bounds.ts",
         "src/Sys/UI/Control.ts",
         "src/Sys/UI/DomElement.ts",
-        "src/Sys/UI/Point.ts",
-        "src/Sys/UI/VisibilityMode.ts"
+        "src/Sys/UI/Point.ts"
     ]
 }

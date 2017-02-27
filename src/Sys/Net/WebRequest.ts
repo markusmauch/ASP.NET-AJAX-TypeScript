@@ -300,29 +300,37 @@ module Sys.Net
             }
         }
 
-        public static _createQueryString( queryString, encodeMethod, addParams )
+        /**
+         * @param queryString
+         *      (Optional) An object containing key value pairs to be serialized as query string.
+         * @param encodeMethod
+         *      (Optional) The method to be used for the encoding. If not specified, the browser's encodeURIComponent method is used.
+         * @param addParams
+         *      (Optiona) Additional parameters; already encoded as url string.
+         */
+        public static _createQueryString( queryString: { [arg: string]: any } | null, encodeMethod: Function | null, addParams?: string )
         {
+            queryString = queryString || {};
             encodeMethod = encodeMethod || encodeURIComponent;
-            var i = 0,
-                obj, val, arg, sb = new Sys.StringBuilder();
-            if ( queryString )
+            
+            let i = 0;
+            let sb = new Sys.StringBuilder();
+            
+            for ( let arg in queryString )
             {
-                for ( arg in queryString )
-                {
-                    obj = queryString[ arg ];
-                    if ( typeof( obj ) === "function" ) continue;
+                let obj = queryString[ arg ];
+                if ( typeof( obj ) === "function" ) continue;
 
-                    val = Sys.Serialization.JavaScriptSerializer.serialize( obj );
-                    if ( i++ )
-                    {
-                        sb.append( '&' );
-                    }
-                    sb.append( arg );
-                    sb.append( '=' );
-                    sb.append( encodeMethod( val ) );
+                let val = Sys.Serialization.JavaScriptSerializer.serialize( obj );
+                if ( i++ )
+                {
+                    sb.append( '&' );
                 }
+                sb.append( arg );
+                sb.append( '=' );
+                sb.append( encodeMethod( val ) );
             }
-            if ( addParams )
+            if ( addParams !== undefined )
             {
                 if ( i )
                 {
@@ -333,7 +341,7 @@ module Sys.Net
             return sb.toString();
         }
 
-        public static _createUrl( url, queryString, addParams )
+        public static _createUrl( url: string, queryString, addParams )
         {
             if ( !queryString && !addParams )
             {
