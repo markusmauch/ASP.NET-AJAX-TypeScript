@@ -5,23 +5,50 @@ module Sys
 
 module Sys.Net
 {
+    export type WebSerciceCallback = ( result: any, userContext: any, methodName: string ) => void;
+    
+    export interface WebServiceDataObject
+    {
+        [propertyName: string]: any;
+    };
+    
+    export interface TypedWebServiceDataObject extends WebServiceDataObject
+    {
+        __type: string;
+    }
+    
+    /**
+     * Provides a way to call a method of a specified Web service asynchronously.
+     */
     export class WebServiceProxy
     {
         static _xdomain = /^\s*([a-zA-Z0-9\+\-\.]+\:)\/\/([^?#\/]+)/;
 
-        private _timeout: number;
-        private _userContext: any;
-        private _succeeded: boolean;
-        private _failed: boolean;
-        private _path: string;
-        private _jsonp: string;
-        private _callbackParameter: string;
+        protected _timeout: number;
+        protected _userContext: any;
+        protected _succeeded: WebSerciceCallback = ( result: any, userContext: any, methodName: string ) => {};
+        protected _failed: WebSerciceCallback = ( result: any, userContext: any, methodName: string ) => {};
+        protected _path: string;
+        protected _enableJsonp = false;
+        protected _jsonp: string;
+        protected _callbackParameter = "Callback";
 
+        /**
+         * Gets the timeout, in milliseconds, for the service.
+         * @returns
+         *      The timeout, in milliseconds, for the service.
+         */
         public get_timeout()
         {
             return this._timeout || 0;
         }
-        public set_timeout( value )
+
+        /**
+         * Sets the timeout, in milliseconds, for the service.
+         * @param value
+         *      The timeout, in milliseconds, for the service.
+         */
+        public set_timeout( value: number )
         {
             if ( value < 0 )
             {
@@ -29,77 +56,228 @@ module Sys.Net
             }
             this._timeout = value;
         }
+
+        /**
+         * Gets the default user context for the service.
+         * @returns
+         *      A reference to the user context for the service.
+         */
         public get_defaultUserContext()
         {
-            return ( typeof( this._userContext ) === "undefined" ) ? null : this._userContext;
+            return this._userContext;
         }
+
+        /**
+         * Sets the default user context for the service.
+         * @param value
+         *      A reference to the user context for the service.
+         */
         public set_defaultUserContext( value )
         {
             this._userContext = value;
         }
+
+        /**
+         * Gets the default succeeded callback function for the service.
+         * @returns
+         *      A reference to the succeeded callback function for the service.
+         */
         public get_defaultSucceededCallback()
         {
             return this._succeeded || null;
         }
+
+        /**
+         * Sets the default succeeded callback function for the service.
+         * @param value
+         *      A reference to the succeeded callback function for the service.
+         */
         public set_defaultSucceededCallback( value )
         {
             this._succeeded = value;
         }
+
+        /**
+         * Gets the default failed callback function for the service.
+         * @returns
+         *      A reference to the failed callback function for the service.
+         */
         public get_defaultFailedCallback()
         {
             return this._failed || null;
         }
+
+        /**
+         * Sets the default failed callback function for the service.
+         * @param value
+         *      A reference to the failed callback function for the service.
+         */
         public set_defaultFailedCallback( value )
         {
             this._failed = value;
         }
+
+        /**
+         * Gets a value that indicates whether the service supports JSONP for cross-domain calls.
+         * @returns
+         *      true if the Web service supports JSONP for cross-domain calls; otherwise, false.
+         */
         public get_enableJsonp()
         {
-            return !!this._jsonp;
+            return this._enableJsonp;
         }
-        public set_enableJsonp( value )
+        
+        /**
+         * Sets a value that indicates whether the service supports JSONP for cross-domain calls.
+         * @param value
+         *      true if the Web service supports JSONP for cross-domain calls; otherwise, false.
+         */
+        public set_enableJsonp( value: boolean )
         {
-            this._jsonp = value;
+            this._enableJsonp = value;
         }
+
+        /**
+         * Gets the path of the service.
+         * @returns
+         *      The full path of the service.
+         */
         public get_path()
         {
             return this._path || null;
         }
-        public set_path( value )
+
+        /**
+         * Sets the path of the service.
+         * @param
+         *      The full path of the service.
+         */
+        public set_path( value: string )
         {
             this._path = value;
         }
+
+        /**
+         * Gets a value that specifies the callback function name for a JSONP request.
+         * @returns
+         *      A string that contains the name of the callback function for a JSONP request.
+         */
         public get_jsonpCallbackParameter()
         {
-            return this._callbackParameter || "callback";
+            return this._callbackParameter;
         }
-        public set_jsonpCallbackParameter( value )
+
+        /**
+         * Sets a value that specifies the callback function name for a JSONP request.
+         * @param value
+         *      A string that contains the name of the callback function for a JSONP request.
+         */
+        public set_jsonpCallbackParameter( value:string )
         {
             this._callbackParameter = value;
         }
-        public _invoke( servicePath: string, methodName: string, useGet: boolean, params: any, onSuccess?, onFailure?, userContext? )
+
+        /**
+         * Called by the service-generated proxy classes.
+         * 
+         * @param servicePath
+         *      A string that contains the Web service URL. ServicePath can be set to a fully qualified URL (http://www.mySite.com/myService.asmx),
+         *      to an absolute URL without the host name or the fully qualified domain name (FQDN) (/myService.asmx), or to a relative URL (../myService.asmx).
+         *      The WebRequest class makes sure that the URL is converted into a form that is usable by network executors.
+         * @param methodName
+         *      A string that contains the name of the Web service method to invoke.
+         * @param useGet
+         *      (Optional) false to set the Web request HTTP verb to POST; otherwise, true. The default is false.
+         * @param params
+         *      (Optional) A JavaScript dictionary that contains named properties (fields) that correspond to the parameters of the method to call.
+         * @param onSuccess
+         *      (Optional) The function that is invoked as a callback if the Web service method call returns successfully.
+         *      onSuccess can be set to null if you do not need it and if you must specify a value for the remaining parameters.
+         *      If no callback function is provided, no action is taken when the Web service method finishes successfully.
+         * @param onFailure
+         *      (Optional) The function that is invoked as a callback if the Web service method call fails.
+         *      onFailure can be set to null if you do not need it and if you must specify a value for the remaining parameters.
+         *      If no callback function is provided, no action is taken if an error occurs during the Web service method call.
+         * @param userContext
+         *      (Optional) Any user-specific information. userContext can be any JavaScript primitive type, array, or object.
+         *      The contents of userContext are passed to the callback functions (if any). If userContext is not provided, null is passed to the callback function.
+         */
+        protected _invoke(
+            servicePath: string,
+            methodName: string,
+            useGet: boolean,
+            params: any,
+            onSuccess?: WebSerciceCallback,
+            onFailure?: WebSerciceCallback,
+            userContext?: any )
         {
             onSuccess = onSuccess || this.get_defaultSucceededCallback();
             onFailure = onFailure || this.get_defaultFailedCallback();
-            if ( userContext === null || typeof userContext === 'undefined' ) userContext = this.get_defaultUserContext();
-            return Sys.Net.WebServiceProxy.invoke( servicePath, methodName, useGet, params, onSuccess, onFailure, userContext, this.get_timeout(), this.get_enableJsonp(), this.get_jsonpCallbackParameter() );
+            if ( userContext === null || undefined )
+            {
+                userContext = this.get_defaultUserContext();
+            }
+            return Sys.Net.WebServiceProxy.invoke(
+                servicePath,
+                methodName,
+                useGet,
+                params,
+                onSuccess,
+                onFailure,
+                userContext,
+                this.get_timeout(),
+                this.get_enableJsonp(),
+                this.get_jsonpCallbackParameter() );
         }
-        
+
+        /**
+         * Invokes the specified Web service method.
+         * @param servicePath
+         *      A string that contains the Web service URL. ServicePath can be set to a fully qualified URL (http://www.mySite.com/myService.asmx),
+         *      to an absolute URL without the host name or the fully qualified domain name (FQDN) (/myService.asmx), or to a relative URL (../myService.asmx).
+         *      The WebRequest class makes sure that the URL is converted into a form that is usable by network executors.
+         * @param methodName
+         *      A string that contains the name of the Web service method to invoke.
+         * @param useGet
+         *      (Optional) false to set the Web request HTTP verb to POST; otherwise, true. The default is false.
+         * @param params
+         *      (Optional) A JavaScript dictionary that contains named properties (fields) that correspond to the parameters of the method to call.
+         * @param onSuccess
+         *      (Optional) The function that is invoked as a callback if the Web service method call returns successfully.
+         *      onSuccess can be set to null if you do not need it and if you must specify a value for the remaining parameters.
+         *      If no callback function is provided, no action is taken when the Web service method finishes successfully.
+         * @param onFailure
+         *      (Optional) The function that is invoked as a callback if the Web service method call fails.
+         *      onFailure can be set to null if you do not need it and if you must specify a value for the remaining parameters.
+         *      If no callback function is provided, no action is taken if an error occurs during the Web service method call.
+         * @param userContext
+         *      (Optional) Any user-specific information. userContext can be any JavaScript primitive type, array, or object.
+         *      The contents of userContext are passed to the callback functions (if any). If userContext is not provided, null is passed to the callback function.
+         * @param timeout
+         *      (Optional) The time in milliseconds that the network executor must wait before timing out the Web request.
+         *      timeout can be an integer or null. By defining a time-out interval, you can control the time that the application must wait for the callback to finish.
+         * @param enableJsonp
+         *      (Optional) true to indicate that the service supports JSONP for cross-domain calls; otherwise, false.
+         * @param jsonpCallbackParameter
+         *      (Optional) The name of the callback parameter for the JSONP request. The default is "callback".
+         * @returns
+         *      The {@link Sys.Net.WebRequest} instance that is used to call the method. This instance can be used to stop the call.
+         */
         public static invoke(
             servicePath: string,
             methodName: string,
             useGet = true,
-            params?,
-            onSuccess?,
-            onFailure?,
-            userContext?,
-            timeout?: number,
+            params?: { [name:string]: any },
+            onSuccess?: WebSerciceCallback | null,
+            onFailure?: WebSerciceCallback | null,
+            userContext?: any,
+            timeout?: number | null,
             enableJsonp?: boolean,
             jsonpCallbackParameter?: string )
         {
-            var schemeHost = ( enableJsonp !== false ) ? Sys.Net.WebServiceProxy._xdomain.exec( servicePath ) : null,
-                tempCallback, jsonp = schemeHost && ( schemeHost.length === 3 ) &&
-                ( ( schemeHost[ 1 ] !== location.protocol ) || ( schemeHost[ 2 ] !== location.host ) );
+            let schemeHost = ( enableJsonp !== false ) ? Sys.Net.WebServiceProxy._xdomain.exec( servicePath ) : null;
+            let tempCallback;
+            let jsonp = schemeHost && ( schemeHost.length === 3 ) && ( ( schemeHost[ 1 ] !== location.protocol ) || ( schemeHost[ 2 ] !== location.host ) );
             useGet = jsonp || useGet;
             if ( jsonp )
             {
@@ -110,12 +288,14 @@ module Sys.Net
             var urlParams = params;
             if ( !useGet || !urlParams ) urlParams = {};
             let timeoutcookie: number | undefined;
-            
-            var script, error, 
-                loader,
-                url = Sys.Net.WebRequest._createUrl( methodName ?
+
+            let script: HTMLScriptElement;
+            let error: WebServiceError;
+            let loader;
+            let url = Sys.Net.WebRequest._createUrl( methodName ?
                     ( servicePath + "/" + encodeURIComponent( methodName ) ) :
                     servicePath, urlParams, jsonp ? ( jsonpCallbackParameter + "=Sys." + tempCallback ) : null );
+            
             if ( jsonp || false ) // TODO
             {
                 script = document.createElement( "script" );
@@ -151,21 +331,22 @@ module Sys.Net
                                 data.StackTrace || null,
                                 data.ExceptionType || null,
                                 data );
-                            error._statusCode = statusCode;
+                            error[ "_statusCode" ] = statusCode; // TODO
                             onFailure( error, userContext, methodName );
                         }
                         else
                         {
+                            let errorMsg: string;
                             if ( data.StackTrace && data.Message )
                             {
-                                error = data.StackTrace + "-- " + data.Message;
+                                errorMsg = data.StackTrace + "-- " + data.Message;
                             }
                             else
                             {
-                                error = data.StackTrace || data.Message;
+                                errorMsg = data.StackTrace || data.Message;
                             }
-                            error = String.format( error ? Sys.Res.webServiceFailed : Sys.Res.webServiceFailedNoMsg, methodName, error );
-                            throw Sys.Net.WebServiceProxy._createFailedError( methodName, String.format( Sys.Res.webServiceFailed, methodName, error ) );
+                            errorMsg = String.format( errorMsg ? Sys.Res.webServiceFailed : Sys.Res.webServiceFailedNoMsg, methodName, errorMsg );
+                            throw Sys.Net.WebServiceProxy._createFailedError( methodName, String.format( Sys.Res.webServiceFailed, methodName, errorMsg ) );
                         }
                     }
                     else if ( onSuccess )
@@ -181,14 +362,18 @@ module Sys.Net
             var request = new Sys.Net.WebRequest();
             request.set_url( url );
             request.get_headers()[ 'Content-Type' ] = 'application/json; charset=utf-8';
-            
-            let body = "";
-            if ( !useGet )
+
+            if ( useGet === true )
             {
-                body = Sys.Serialization.JavaScriptSerializer.serialize( params );
-                if ( body === "{}" ) body = "";
+                request.set_httpVerb( "GET" );
             }
-            request.set_body( body );
+            else
+            {
+                request.set_httpVerb( "POST" );
+                let body = Sys.Serialization.JavaScriptSerializer.serialize( params );
+                if ( body === "{}" ) body = "";
+                request.set_body( body );
+            }
             request.add_completed( onComplete );
             if ( timeout && timeout > 0 ) request.set_timeout( timeout );
             request.invoke();
@@ -303,18 +488,19 @@ module Sys.Net
             throw Sys.Net.WebServiceProxy._createFailedError( methodName, String.format( Sys.Res.webServiceFailed, methodName, error ) );
         }
 
-        public static _generateTypedConstructor( type )
+        public static _generateTypedConstructor( type ): ( properties?: WebServiceDataObject ) => TypedWebServiceDataObject
         {
-            return function( properties )
+            return function( properties?: WebServiceDataObject )
             {
-                if ( properties )
+                let result: TypedWebServiceDataObject = { __type: type };
+                if ( properties !== undefined )
                 {
                     for ( var name in properties )
                     {
-                        this[ name ] = properties[ name ];
+                        result[ name ] = properties[ name ];
                     }
                 }
-                this.__type = type;
+                return result;
             }
         }
     }
