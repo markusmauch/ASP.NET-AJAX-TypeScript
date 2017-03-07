@@ -6,47 +6,88 @@ module Sys
      * The members can be invoked without creating an instance of the class.
      * @see {@link http://msdn.microsoft.com/en-us/library/bb384161(v=vs.100).aspx}
      */
-    export class Application extends Component
+    class _Application extends Component
     {
+        private _disposableObjects: Component[] = [];
+        private _components:
+        {
+            [ name: string ]: Component
+        } = {};
+        private _createdComponents: Component[] = [];
+        private _secondPassComponents: Component[] = [];
+        private _disposing = false;
+        private _loaded = false;
+
         constructor()
         {
             super();
+
+            Sys.UI.DomEvent.addHandler( window, "unload", this._unloadHandler );
+            this._domReady();
         }
 
         /**
-         * Raised after all scripts have been loaded but before objects are created.
+         * Gets a value that indicates whether the application is in the process of creating components. This member is static and can be invoked without creating an instance of the class.
          */
-        public add_init( handler: EventHandler < Application, EventArgs > )
+        public get_isCreatingComponents(): boolean
+        {
+            return true;
+        }
+
+        /**
+         * Gets or sets a value that indicates whether the Web application supports history point management.
+         */
+        public get_enableHistory(): boolean
+        {
+            return true;
+        }
+
+        /**
+         * Gets or sets a value that indicates whether the Web application supports history point management.
+         * @param value
+         *           true to allow the Web application to support history points, or false to not allow history points.
+         */
+        public set_enableHistory( value: boolean ): void
         {}
 
         /**
          * Raised after all scripts have been loaded but before objects are created.
          */
-        public remove_init( handler: EventHandler < Application, EventArgs > )
+        public add_init( handler: EventHandler < _Application, EventArgs > )
+        {}
+
+        /**
+         * Raised after all scripts have been loaded but before objects are created.
+         */
+        public remove_init( handler: EventHandler < _Application, EventArgs > )
         {}
 
         /**
          * Raised after all scripts have been loaded and after the objects in the application have been created and initialized.
          */
-        public add_load( handler: EventHandler < Application, ApplicationLoadEventArgs > )
-        {}
+        public add_load( handler: EventHandler < _Application, ApplicationLoadEventArgs > )
+        {
+            this.get_events().addHandler( "load", handler );
+        }
 
         /**
          * Raised after all scripts have been loaded and after the objects in the application have been created and initialized.
          */
-        public remove_load( handler: EventHandler < Application, ApplicationLoadEventArgs > )
+        public remove_load( handler: EventHandler < _Application, ApplicationLoadEventArgs > )
+        {
+            this.get_events().removeHandler( "load", handler );
+        }
+
+        /**
+         * Occurs when the user clicks the browser's Back or Forward button.
+         */
+        public add_navigate( handler: EventHandler < _Application, HistoryEventArgs > )
         {}
 
         /**
          * Occurs when the user clicks the browser's Back or Forward button.
          */
-        public add_navigate( handler: EventHandler < Application, HistoryEventArgs > )
-        {}
-
-        /**
-         * Occurs when the user clicks the browser's Back or Forward button.
-         */
-        public remove_navigate( handler: EventHandler < Application, HistoryEventArgs > )
+        public remove_navigate( handler: EventHandler < _Application, HistoryEventArgs > )
         {}
 
         /** 
@@ -125,7 +166,34 @@ module Sys
          * This function supports the client-script infrastructure and is not intended to be used directly from your code.
          */
         public initialize(): void
-        {}
+        {
+            if ( !this.get_isInitialized() && !this._disposing )
+            {
+                super.initialize();
+                this._raiseInit();
+                // TODO
+                /*if ( this.get_stateString )
+                {
+                    if ( Sys.WebForms && Sys.WebForms.PageRequestManager )
+                    {
+                        this._beginRequestHandler = Function.createDelegate( this, this._onPageRequestManagerBeginRequest );
+                        Sys.WebForms.PageRequestManager.getInstance().add_beginRequest( this._beginRequestHandler );
+                        this._endRequestHandler = Function.createDelegate( this, this._onPageRequestManagerEndRequest );
+                        Sys.WebForms.PageRequestManager.getInstance().add_endRequest( this._endRequestHandler );
+                    }
+                    var loadedEntry = this.get_stateString();
+                    if ( loadedEntry !== this._currentEntry )
+                    {
+                        this._navigate( loadedEntry );
+                    }
+                    else
+                    {
+                        this._ensureHistory();
+                    }
+                }*/
+                this.raiseLoad();
+            }
+        }
 
         /**
          * Called by a referenced script to indicate that it has been loaded. This API is obsolete. You no longer need to call this method in order to notify the Microsoft Ajax Library that the JavaScript file has been loaded.
@@ -146,29 +214,10 @@ module Sys
         {}
 
         /**
-         * Gets or sets a value that indicates whether the Web application supports history point management.
-         */
-        public get_enableHistory(): boolean
-        {
-            return true;
-        }
-
-        /**
-         * Gets or sets a value that indicates whether the Web application supports history point management.
-         * @param value
-         *           true to allow the Web application to support history points, or false to not allow history points.
-         */
-        public set_enableHistory( value: boolean ): void
-        {}
-    }
-
-    export module Application
-    {
-        /**
          * Returns the specified Component object. This member is static and can be invoked without creating an instance of the class.
          * @return A Component object that contains the component requested by ID, if found; otherwise, null.
          */
-        export function findComponent( id: string, parent ? : Sys.Component | HTMLElement ): Sys.Component
+        public findComponent( id: string, parent ? : Sys.Component | HTMLElement ): Sys.Component
         {
             return new Sys.Component();
         }
@@ -176,41 +225,94 @@ module Sys
         /**
          * Raises the load event. This member is static and can be invoked without creating an instance of the class.
          */
-        export function raiseLoad(): void
-        {}
+        public raiseLoad(): void
+        {
+            var h = this.get_events().getHandler( "load" );
+            var args = new Sys.ApplicationLoadEventArgs( Array.clone( this._createdComponents ), !!this._loaded );
+            this._loaded = true;
+            if ( h )
+            {
+                h( this, args );
+            }
+            /*if ( window.pageLoad )
+            {
+                window.pageLoad( this, args );
+            }*/
+            this._createdComponents = [];
+        }
 
         /**
          * Registers with the application an object that will require disposing. This member is static and can be invoked without creating an instance of the class.
          */
-        export function registerDisposableObject( object: Component ): void
+        public registerDisposableObject( object: Component ): void
         {}
 
         /**
          * Removes the object from the application and disposes the object if it is disposable. This member is static and can be invoked without creating an instance of the class.
          */
-        export function removeComponent( component: Component ): void
+        public removeComponent( component: Component ): void
         {}
 
         /**
          * Unregisters a disposable object from the application. This member is static and can be invoked without creating an instance of the class.
          */
-        export function unregisterDisposableObject( object: any ): void
+        public unregisterDisposableObject( object: any ): void
         {}
 
-        /**
-         * Gets a value that indicates whether the application is in the process of creating components. This member is static and can be invoked without creating an instance of the class.
-         */
-        export function get_isCreatingComponents(): boolean
-        {
-            return true;
-        }
 
         /**
          * Gets a value that indicates whether the application is in the process of disposing its resources. This member is static and can be invoked without creating an instance of the class.
          */
-        export function get_isDisposing(): boolean
+        public get_isDisposing(): boolean
         {
             return true;
         }
+
+        private _domReady()
+        {
+
+            let init = () =>
+            {
+                this.initialize();
+            }
+
+            let onload = () =>
+            {
+                Sys.UI.DomEvent.removeHandler( window, "load", onload );
+                init();
+            }
+
+            Sys.UI.DomEvent.addHandler( window, "load", onload );
+
+            try
+            {
+                let check = () =>
+                {
+                    document.removeEventListener( "DOMContentLoaded", check, false );
+                    init();
+                };
+                document.addEventListener( "DOMContentLoaded", check, false );
+            }
+            catch ( er )
+            {}
+        }
+
+        private _raiseInit()
+        {
+            var handler = this.get_events().getHandler( "init" );
+            if ( handler )
+            {
+                this.beginCreateComponents();
+                handler( this, Sys.EventArgs.Empty );
+                this.endCreateComponents();
+            }
+        }
+
+        private _unloadHandler()
+        {
+            this.dispose();
+        }
     }
+
+    export var Application = new _Application();
 }

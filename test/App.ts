@@ -1,6 +1,7 @@
 
 let ctrl = $get( "Control" );
 
+Sys.Application.add_load( ( sender, args ) => console.log( "Sys.Application.load" ) );
 
 class Test extends Sys.UI.Control
 {

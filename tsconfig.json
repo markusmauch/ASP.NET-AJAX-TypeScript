@@ -16,6 +16,7 @@
         "src/Sys/EventArgs.ts",
         "src/Sys/ApplicationLoadEventArgs.ts",
         "src/Sys/HistoryEventArgs.ts",
+        "src/Sys/UI/DomEvent.ts",
         "src/Sys/Application.ts",
         "src/Sys/Browser.ts",
         "src/Sys/CultureInfo.ts",
