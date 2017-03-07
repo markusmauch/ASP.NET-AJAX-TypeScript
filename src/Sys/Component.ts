@@ -5,7 +5,7 @@ module Sys
      */
     export class Component
     {
-        private _initialized = false;
+        protected _initialized = false;
         private _disposed = false;
         private _updating = false;
         protected _id: string;

@@ -54,13 +54,24 @@ module Sys
          * Raised after all scripts have been loaded but before objects are created.
          */
         public add_init( handler: EventHandler < _Application, EventArgs > )
-        {}
+        {
+            if ( this._initialized )
+            {
+                handler( this, Sys.EventArgs.Empty );
+            }
+            else
+            {
+                this.get_events().addHandler( "init", handler );
+            }
+        }
 
         /**
          * Raised after all scripts have been loaded but before objects are created.
          */
         public remove_init( handler: EventHandler < _Application, EventArgs > )
-        {}
+        {
+            this.get_events().removeHandler( "init", handler );
+        }
 
         /**
          * Raised after all scripts have been loaded and after the objects in the application have been created and initialized.
